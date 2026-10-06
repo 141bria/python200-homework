@@ -118,12 +118,21 @@ class StationBatch:
 
 ##Pydantic##
 ##Q1##
-from pydantic import BaseModel,Field, ValidationError
+from pydantic import BaseModel,Field, model_validator,ValidationError
 class Reading(BaseModel):
    station_id : str = Field(min_length=3)
    timestamp : str
    temperature_c : float = Field(ge=-90,le=60)
    humidity : float = Field(ge=0,le=100)
+   @model_validator(mode="after")
+   def check_humidty(self):
+       """The humidty cannot be 0."""
+       if self.humidity == 0 and self.temperature_c <  -40:
+           raise ValueError(
+               f"humidity ({self.humidity}) cannot be 0 and ({self.temperature_c})cannot be less than -40)"
+           )
+       return self
+
 
 reading_1 = Reading(
     station_id= "Flo-235",
@@ -154,3 +163,75 @@ try:
     humidity = 89)
 except ValidationError as e:
     print("Missing value",e)
+reading_5 = Reading(
+    station_id= "TN-901",
+    timestamp = "six o'clock",
+    temperature_c = "21.5",
+    humidity = 40)
+print(reading_5)
+type(reading_5.temperature_c)
+type(reading_5.humidity)
+## Pydantic was able to accept temperature_c because it saw the string could be changed to a float, but humidity required a float but there wasn't a numeric value in sight##
+##Q3##
+try:
+    reading_6 = Reading(
+    station_id= "NY",
+    temperature_c = "twenty",
+    humidity = 70
+)
+except ValidationError as e:
+    for error in e.errors():
+        print(error["loc"],error["msg"])
+## There were a total of three errors reported. Being able to read all errors at once may make debugging easier instead of reading what went wrong one line at a time.##
+##Q4##
+##model_validator added to Q1. Field constraints alone aren't enough because it's limited to one field vs model validator can has a guard for mutliple fields not just one#
+reading_7 = Reading(
+    station_id= "MS-662",
+        timestamp = "seven o'clock",
+        temperature_c = 55,
+        humidity = 30
+)
+try:
+    reading_8 = Reading(
+    station_id= "ATL-404",
+        timestamp = "six o'clock",
+        temperature_c = -41,
+        humidity = 0
+)
+except ValidationError as e:
+    print("Humidity can't be 0 & Temperature can't be less than -40:",e)
+import pytest
+def celsius_to_fahrenheit(celsius: float) -> float:
+    """ testing conversion of Celsisus to Farehient"""
+    return celsius * 9/5 + 32
+def test_celsius_to_fahrenheit():
+    assert celsius_to_fahrenheit (0) == 32
+    assert celsius_to_fahrenheit (100) == 212
+    assert celsius_to_fahrenheit (37) == pytest.approx(98.6)
+    ## 98.6 was a float that could've had small precision differences like 98.600003, we needed pytest.approx to indicate close to the value and not an exact value that == would've required.##
+    ##Q2##
+def mean(values: list[float]) -> float:
+        if len(values) == 0:
+            raise ValueError("Can't have an empty list!")
+        else:
+            return sum(values)/len(values)
+def test_mean_of_empty_raises():
+    with pytest.raises(ValueError,match="empty"):
+        mean([])
+## ValueError checks that the type of error we expected occured,match checks to see that the error message has what we expected##
+##Q3##
+@pytest.mark.parametrize(
+        "values,output",
+    [
+    ([7],7),
+    ([-3,-9,-4,-20],-9),
+    ([-7,3,-25,21],-2),
+    ([0,3,2,1,5,-1],pytest.approx(1.6666666667))
+    ],
+)
+def test_mean_values(values,output):
+    assert mean(values) == output
+##6 passed in 0.08s##
+##Q4##
+##FAILED warmup_01.py::test_celsius_to_fahrenheit - assert 257.0 == 212##
+## pytest showed the value was now 257 instead of 212, this is far more useful than assertion failed because assert looks to see if the values equal each other but pytest shows you the actual and expected values so we can see what went wrong.##
