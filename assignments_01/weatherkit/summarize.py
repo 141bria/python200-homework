@@ -51,11 +51,15 @@ class DailyAggregator:
             day =  reading.timestamp.split("T")[0]
             if day not in not_a_full_day:
                 not_a_full_day[day] = []
-                not_a_full_day[day].append(reading)
+            not_a_full_day[day].append(reading)
         for day, daily_readings in not_a_full_day.items():
             day_observed = len(daily_readings)
             if day_observed< self.min_hours:
                 less_than_a_day.append(day)
         return less_than_a_day
 
-
+## Intentional Breaking Reflection: test_rain_sum caught the intentional precipitation_sum change.##
+                            ## Task 7: Reflections ##
+## 1. I don't believe rejecting the whole file is always the best choice becasue one missing temp doesn't mean all the weather data is useless. I would probably want a strict rejection if I needed complete & accurate data for every hour or so. I think I would be okay with the gap if one temp was missing but the rest of the data was still useful. To allow that, I would change the temp field to accept a number or None.##
+## 2. Since the min_hours is 24hrs, if the pipeline ran at noon, the current day only had about 12hrs of data & would be treated as incomplete then would be dropped. incompleted_days() helps by showing us which days were dropped,so the missing data does not disappear without some kind of explaintion.##
+## 3. Writing weatherkit as a package vs a file makes the code easier to organize and reuse it later. In week 10, the pipeline can import only the pieces it needs, like the schema,records, or aggregator instead of using one big file.##
