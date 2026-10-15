@@ -87,5 +87,21 @@ X_train_2,X_test_2,y_train_2,y_test_2 = train_test_split(
 model_2.fit(X_train_2,y_train_2)
 predicted_2 = model_2.predict(X_test_2)
 rmse = np.sqrt(mean_squared_error(y_test_2,predicted_2))
-r2 = r2_score(y_test_2,predicted_2)
-#stopping point#
+r2_2 = r2_score(y_test_2,predicted_2)
+print("Q4 R2:",r2_2)
+print("temp_min coefficient:", model_2.coef_[0])
+print("is_rainy coefficient:", model_2.coef_[1])
+#R2 in Q4 is higher so adding is_rainy helped the model predict better.#
+# Rainy days were predicted to have a daily high about 2.92 lower than non-rainy days with the same daily low.#
+#Q5#
+low = min(predicted_2.min(),y_test_2.min())
+high = max(predicted_2.max(),y_test_2.max())
+plt.scatter(predicted_2,y_test_2, color="blue", alpha= 0.5)
+plt.title("Predicted vs Actual")
+plt.plot([low, high], [low, high], color="red", label="Perfect prediction")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.savefig("outputs/predicted_vs_actual_warmup.png")
+plt.show()
+# AI assistance was used to help me understand how to calculate the low/high range and use it to create the diagonal reference line.
+# When the point is above the diagonal it means the model predicted too low vs if the point is below the diagonal it means the model predicted too high.#
