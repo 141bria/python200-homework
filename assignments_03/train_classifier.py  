@@ -1,4 +1,8 @@
 #Task 1#
+import joblib
+import sys
+import sklearn
+import json
 import requests
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -76,3 +80,28 @@ print("Final test accuracy:", accuracy_score(y_test, logreg_model.predict(X_test
 print(classification_report(y_test,y_pred1,target_names=["skip","good"]))
 # precipitation_sum most strongly pushes the day toward "Skip".#
 #Task 5#
+#KNN had a higher accuracy than the Logisitc Regression. KNN had about 94% accuraucy while the Logisitc Regression had about 65%. In this case, I would care more about precision and recall than just accuracy because I wouldn't want the app telling someone it's a good day to run when it's actually bad and they get rained on. I also wouldn't want the app to say it's a bad day to run and they should skip when they could've gone running that day. I would prefer precision because I want the app to be something a user can trust when it says it's a good day. I would use KNN because it had better accuracy, precision, recall, and F1 scores. It also looks at the closest neighbor and it's pattern to help determin if a day is good for running or not. Even though KNN may take more space and be slower when making the predicitions because it has to comapre nearby days, I would still choose it because it performed better. Logisitic Regression is easier to understand and usually faster but KNN can give probablity scores to show how confident it is about a good running day. I think that would be useful for an app#
+
+#Task 6#
+joblib.dump(knn,"models/weather_classifier.pkl")
+print("KNN saved.")
+clf = joblib.load("models/weather_classifier.pkl")
+print(type(clf))
+metadata = {
+   "python_version": sys.version,
+    "sklearn_version": sklearn.__version__,
+    "features": list(X.columns),
+    "label": "good_for_running",
+    "test_accuracy": 0.939,
+    "test_f1": 0.940,
+    "label_rule": {
+        "temperature_2m_max": "7 to 26 C",
+        "temperature_2m_min": ">= 0 C",
+        "precipitation_sum": "< 3 mm",
+        "wind_speed_10m_max": "< 30 km/h",
+    },
+    "city":"Atlanta,Georgia",
+}
+with open("models/weather_classifier_metadata.json","w") as f:
+    json.dump(metadata,f,indent=2)
+    print("Metadata saved.")
