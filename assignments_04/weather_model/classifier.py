@@ -36,7 +36,7 @@ class WeatherClassifier:
         for day in days:
             for feature in FEATURES:
                 if feature not in day:
-                    raise ValueError(f"missing feature:",{feature})
+                    raise ValueError(f"missing feature: {feature}")
         weather_days = pd.DataFrame(days)
         weather_days[FEATURES]
         running_days = self.model.predict(weather_days[FEATURES])
@@ -48,4 +48,9 @@ class WeatherClassifier:
             else:
                 label="skip"
             predictions.append(Prediction(label,float(probability)))
-            return predictions
+        return predictions
+# AI Assistance Disclosure:
+# I used AI for guidance on Python syntax, indentation,
+# debugging, and understanding assignment instructions.
+# ChatGPT also provided some code examples and helped me
+# correct specific sections while I worked through the assignment.
