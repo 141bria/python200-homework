@@ -178,10 +178,44 @@ ai_problem_solver = client.chat.completions.create(
 print("AI Response:", ai_problem_solver.choices[0].message.content)
 #I would say asking the AI to solve the problem step by step helps us understand how it got the answer and makes it easier to catch mistakes.#
 #Q5#
+
 review = "I've been using this tool for three months. It handles large datasets well, \
 but the UI is clunky and the export options are limited."
 ai_analyze_review = client.chat.completions.create(
-     model="chatgpt-4o-mini",
-     messages={"role":"system","content": "Analyze the review and return the results only as valid JSON with sentiment,confidence,and reason"},
-               {"role":"user","content":review}]
+    model="gpt-4o-mini",
+    messages=[
+        {"role":"system",
+        "content": "Analyze the review and return the results only as valid JSON with sentiment,confidence,and reason. The sentiment will be one of the following: positivie, negative, or mixed. Confidence will be a float ranging from 0-1.Reason will be one sentence explainiing the explaintion of the decision."
+        },
+    {
+    "role":"user",
+    "content":review
+    }
+    ]
 )
+try:
+    json_load= json.loads(ai_analyze_review.choices[0].message.content)
+except json.JSONDecodeError:
+    print("Error: response was not valid JSON")
+print("Sentiment:", json_load["sentiment"],"Confidence:", json_load["confidence"],"Reason:",json_load["reason"])
+#Q6#
+user_text = "First boil a pot of water. Once boiling, add a handful of salt and the \
+pasta. Cook for 8-10 minutes until al dente. Drain and toss with your sauce of choice."
+
+prompt = f"""
+You will be given text inside triple backticks.
+If it contains step-by-step instructions, rewrite them as a numbered list.
+If it does not contain instructions, respond with exactly: "No steps provided."
+
+```{user_text}```
+"""
+ai_cooking_instructions = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role":"system",
+            "content": prompt},
+        {"role":"user",
+        "content":user_text
+        }
+        ]
+)
+print(ai_cooking_instructions.choices[0].message.content)
