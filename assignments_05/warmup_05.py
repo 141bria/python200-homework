@@ -219,3 +219,35 @@ ai_cooking_instructions = client.chat.completions.create(
         ]
 )
 print(ai_cooking_instructions.choices[0].message.content)
+
+user_text = "Life is about the journey not the destiantion"
+
+prompt = f"""
+You will be given text inside triple backticks.
+If it contains step-by-step instructions, rewrite them as a numbered list.
+If it does not contain instructions, respond with exactly: "No steps provided."
+
+```{user_text}```
+"""
+ai_cooking_instructions1 = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role":"system",
+            "content": prompt},
+        {"role":"user",
+        "content":user_text
+        }
+        ]
+)
+print(ai_cooking_instructions1.choices[0].message.content)
+#Delimeters help AI seperate user text from instructions so it does not get confused.#
+                            #Local Models with Ollama#
+#Q1#
+#Ollama output: "A large language model is a complex AI system that can understand and generate human-like text, learning from vast datasets to improve its knowledge and understanding. It processes and generates natural language, enabling tasks like writing, answering questions, and creating content."#
+#Open AI API output: "A large language model (LLM) is an advanced artificial intelligence system designed to understand and generate human language by processing vast amounts of text data. It uses complex algorithms, often based on deep learning techniques, to predict the likelihood of word sequences, enabling it to produce coherent and contextually relevant responses."
+ai_explain_model = client.chat.completions.create(
+     model="gpt-4o-mini",
+     messages=[{"role":"user",
+                "content":"Explain what a large language model is in two sentences."}]
+)
+print(ai_explain_model.choices[0].message.content)
+#Both models gave similar answers, but OpenAI's response was more technical and polished.An advatange of running AI locally is that I don't need internet access after downloading the model. A disadvanatge is that local models use my computer's resources which could affect the performance of my computer.#
