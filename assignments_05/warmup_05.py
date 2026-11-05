@@ -1,4 +1,5 @@
-                                #API#
+import json                       
+                #API#
 #Q1#
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -104,6 +105,7 @@ reviews = [
     "The software crashes constantly and support never responds.",
     "Great price, but the documentation is nearly impossible to follow."
     ]
+print("\n--- Question 1 ---")
 for number, review in enumerate(reviews, start=1):
     prompt = "Classifiy the sentiment of each review below as postive,negative, or mixed."
     ai_check_review = client.chat.completions.create(
@@ -115,3 +117,71 @@ for number, review in enumerate(reviews, start=1):
         ]
     )
     print("Review Number:",number, "AI Response:", ai_check_review.choices[0].message.content)
+#Q2#
+reviews = [
+"The onboarding process was smooth and the team was welcoming.",
+"The software crashes constantly and support never responds.",
+"Great price, but the documentation is nearly impossible to follow."
+]
+print("\n--- Question 2 ---")
+for number, review in enumerate(reviews, start=1):
+    prompt = """Classifiy the sentiment of each review below as postive,negative, or mixed.",
+    Example:
+    Review: "Fast shipping but the item arrived damaged.",
+    Sentiment: mixed
+    """
+    ai_check_review = client.chat.completions.create(
+    model="gpt-4o-mini",
+    temperature=0,
+    messages=[
+        {"role":"system", "content": prompt},
+        {"role":"user","content":review}
+        ]
+    )
+    print("Review Number:",number, "AI Response:", ai_check_review.choices[0].message.content)
+#I noticed that Q2 had a different format than Q2, but the output remained the same.#
+#Q3#
+reviews1 = [
+    "The onboarding process was smooth and the team was welcoming.",
+    "The software crashes constantly and support never responds.",
+    "Great price, but the documentation is nearly impossible to follow."
+    ]
+print("\n--- Question 3 ---")
+for number, review in enumerate(reviews1, start=1):
+        prompt = """Classifiy the sentiment of each review below as postive,negative, or mixed.",
+        Example:
+        Review: "Fast shipping but the item arrived damaged.",
+        Sentiment: mixed
+        Review: "Fast shipping great item.",
+        Sentiment: positive
+        Review: "Slow shipping and the item arrived damaged.",
+        Sentiment: negative
+        """
+        ai_check_review = client.chat.completions.create(
+        model="gpt-4o-mini",
+        temperature=0,
+        messages=[
+            {"role":"system", "content": prompt},
+            {"role":"user","content":review}
+            ]
+        )
+        print("Review Number:",number, "AI Response:", ai_check_review.choices[0].message.content)
+# Zero-shot asks the model to classify something without giving it any examples. One-shot does the same thing but gives one example to show the model how we want the response formatted. Few-shot gives multiple examples, like positive, negative, and mixed reviews, so the model can better understand the pattern. I would use zero-shot if I wanted to see what the model comes up with on its own, one-shot if I only needed one example to clarify what I wanted, and few-shot if I wanted the model to follow a specific pattern using multiple examples. It really just depends on what I'm trying to accomplish and how much guidance I want to give the model.#
+#Q4#
+print("\n--- Question 4 ---")
+ai_problem_solver = client.chat.completions.create(
+     model="gpt-4o-mini",
+     messages=[{"role":"system","content": "Solve the following problem and show your reasoning step-by-step before giving a final answer"},
+               {"role":"user","content":"""A data engineer earns $85,000 per year. She gets a 12% raise, then 6 months later takes a new job that pays $7,500 more per year that her post-raise salary.
+                What is her final annual salary?"""}]
+)
+print("AI Response:", ai_problem_solver.choices[0].message.content)
+#I would say asking the AI to solve the problem step by step helps us understand how it got the answer and makes it easier to catch mistakes.#
+#Q5#
+review = "I've been using this tool for three months. It handles large datasets well, \
+but the UI is clunky and the export options are limited."
+ai_analyze_review = client.chat.completions.create(
+     model="chatgpt-4o-mini",
+     messages={"role":"system","content": "Analyze the review and return the results only as valid JSON with sentiment,confidence,and reason"},
+               {"role":"user","content":review}]
+)
