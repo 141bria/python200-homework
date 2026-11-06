@@ -168,6 +168,7 @@ def run_chatbot():
 
         # 7. Otherwise, handle it as a regular chat turn
         else:
+            messages.append({"role": "user", "content": user_input})
             reply = get_completion(messages)
             print(reply)
             messages.append({"role": "assistant", "content": reply})
@@ -178,3 +179,11 @@ def run_chatbot():
             # - Append the reply to `messages` as an assistant message
 if __name__ == "__main__":
     run_chatbot()
+
+#AI Assistance and Learning Disclosure:
+#I used ChatGPT throughout this project to help me understand instructions, troubleshoot errors, and correct Python syntax. I made an effort to reason through the tasks and write code independently before asking for assistance. In Task 3, ChatGPT helped me with the get_completion() call, return statement, function arguments, and indentation errors. In Task 4, it helped me write the if/else statement for checking flagged messages and returning True or False. In Task 5, ChatGPT helped me connect rewrite_bullets() and generate_cover_letter(), print their results, and use messages.append() to save user and assistant messages. It also helped me use print(len(messages)) to test whether the chatbot remembered previous conversations. As I experienced mental fatigue, I needed more direct help with certain lines of code. However, I still created my own prompts, reviewed the code, asked questions, corrected errors, and tested the chatbot's features. I want to be transparent about the assistance I received while recognizing the effort I put into understanding and completing this assignment.
+#
+
+#Task 6#
+#Format Chosen: Option A - Comment Block: 
+# One thing that could go wrong is the chatbot making spelling errors that the user doesn't catch before submitting their application. Someone could also accidentally copy both the original and improved bullet points instead of just the improved version. One guardrail I would add is a warning reminding users to review their resumes and cover letters for errors or made-up information before submitting them to an employer. I would also consider adding a token limit because creating resumes can require a lot of tokens, which can become expensive. These changes would help users avoid mistakes while also keeping the chatbot affordable to use.#
