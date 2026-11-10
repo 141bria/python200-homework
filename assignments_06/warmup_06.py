@@ -127,10 +127,12 @@ simple_keyword_retrieval(query = "How do I sign up for rewards?",documents = {
 #Q1#
 from llama_index.core import Settings
 from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.llms.openai import OpenAI
 from llama_index.core import SimpleDirectoryReader
 from llama_index.core import SimpleDirectoryReader,VectorStoreIndex
 
 Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+Settings.llm = OpenAI(model="gpt-4o-mini")
 docs = SimpleDirectoryReader("brightleaf_pdfs").load_data()
 index = VectorStoreIndex.from_documents(docs)
 query_engine = index.as_query_engine(similarity_top_k=3)
@@ -138,12 +140,78 @@ questions = [
     "What employee benefits does BrightLeaf offer?",
     "What are BrightLeaf's security policies?",
 ]
+print("\n===== K=3 RESULTS =====")
 for q in questions:
     print(f"\nQ:{q}")
     response = query_engine.query(q)
     print("A:", response)
-for node_with_score in response.source_nodes:
-    print()
-    print()
-    print()
-    print()
+    for node_with_score in response.source_nodes:
+        print(f"Similarity Score:{node_with_score.score:.4f}")
+        print(f"Text Snippet:{node_with_score.node.get_content()[:150]}")
+        print("-"*30)
+    #**1. Do the retrieved chunks look relevant to the question? Yes. For employee benefits, the retrieved chunks explained the health benefits, financial benefits, parental leave, and professional development, which are all benefits Brightleaf offers.
+
+    #For security policies, yes and no. It explained things like layered security defenses and multi-factor authentication, which are relevant. But it also went into incident response plans and employee security training, which I felt was a little extra compared to what I was asking.
+
+    #2. Does the model's response sound confident and specific?
+    # Yes. The model's response sounds confident and specific because it's referencing information from the PDFs. I didn't notice it using phrases like "based on the context" or "I'm not sure."
+
+    #3. Did anything unexpected get retrieved?
+    # Yes. For the security policies question, it also retrieved information about employee training, ISO practices, and quarterly risk reviews. I wasn't necessarily expecting all that extra information because I was mainly asking about Brightleaf's security policies.
+    #Q2#
+query_engine = index.as_query_engine(similarity_top_k=1)
+questions = [
+    "What employee benefits does BrightLeaf offer?"
+]
+print("\n===== K=1 RESULTS =====")
+for q in questions:
+    print(f"\nQ:{q}")
+    response = query_engine.query(q)
+    print("A:", response)
+    for node_with_score in response.source_nodes:
+        print(f"Similarity Score:{node_with_score.score:.4f}")
+        print(f"Text Snippet:{node_with_score.node.get_content()[:150]}")
+        print("-"*30)
+
+    query_engine = index.as_query_engine(similarity_top_k=5)
+    questions = [
+        "What employee benefits does BrightLeaf offer?"
+    ]
+    print("\n===== K=5 RESULTS =====")
+    for q in questions:
+        print(f"\nQ:{q}")
+        response = query_engine.query(q)
+        print("A:", response)
+        for node_with_score in response.source_nodes:
+            print(f"Similarity Score:{node_with_score.score:.4f}")
+            print(f"Text Snippet:{node_with_score.node.get_content()[:150]}")
+        print("-"*30)
+        #The responses for K=1 and K=5 were pretty similar. Both explained Brightleaf's employee benefits, including health, financial benefits, parental leave, and career development. K=1 retrieved one relevant chunk, while K=5 retrieved five chunks, including some unrelated information about partnerships, finances, and security. I don't think more retrieved context is always better because it can bring in information that doesn't really relate to the question.#
+
+print("\n===== Specific K3 RESULTS =====")
+#Q3#
+query_engine = index.as_query_engine(similarity_top_k=3)
+question = "What is the company policy when it comes to establishing new partnerships?"
+response1 = query_engine.query(question)
+print("A:", response1)
+for node_with_score in response1.source_nodes:
+    print(f"Similarity Score:{node_with_score.score:.4f}")
+    print(f"Text Snippet:{node_with_score.node.get_content()[:150]}")
+    print("-"*30)   
+  
+# I predict that the model may struggle to find information related to the question and may result in no overlap.#
+# The model surprisingly gave me information about Brightleaf's strategy for choosing partnerships, but it didn't necessarily explain what their actual policy is.#
+# I guess I would change my prompt to tell the model to say when the documents don't have the exact answer instead of giving me info that's unrelated to my question.#
+
+#Q4#
+from llama_index.core.evaluation import FaithfulnessEvaluator,RelevancyEvaluator
+llm = OpenAI(model="gpt-4o-mini", temperature=0.2)
+faithfulness_evaluator = FaithfulnessEvaluator(llm=llm)
+relevancy_evaluator = RelevancyEvaluator(llm=llm)
+print("\n===== Q4 EVALUATION RESULTS =====")
+q = "What employee benefits does BrightLeaf offer?"
+response2 =query_engine.query(q)
+faithfulness_result = faithfulness_evaluator.evaluate_response(query=q,response=response2)
+print("Faithfulness Evaluation: "+ str(faithfulness_result.score))
+relevancy_result = relevancy_evaluator.evaluate_response(query=q,response=response2)
+print("Relevancy Result: " + str(relevancy_result.score))
