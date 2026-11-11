@@ -68,3 +68,5 @@ for node_with_score in response1.source_nodes:
 #Q1:# My LlamaIndex implementation took about 4 lines of code. Using LlamaIndex helps reduce the amount of code needed, which leaves less room for errors. It also makes the process easier by streamlining everything instead of having to write all the steps myself.#
 #Q2: # This could help businesses and organizations when HR isn't available. Employees could use the system to find information that's already been uploaded, like company history, benefits, or hours. This would allow employees to do some of the groundwork themselves instead of always having to reach out to HR.#
 #Q3: One failure RAG can't fully prevent is hallcuination. Even when it gets the right info, AI can still make aassumptions that aren't supported by documents#
+
+#AI Usage: I used ChatGPT to help me remember some Python syntax, understand how certain functions worked, and troubleshoot errors when I got stuck. I also used it to help organize my reflection comments. I worked through the assignment myself, researched syntax, tested my code, and corrected several errors on my own.#
