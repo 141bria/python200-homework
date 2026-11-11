@@ -215,3 +215,14 @@ faithfulness_result = faithfulness_evaluator.evaluate_response(query=q,response=
 print("Faithfulness Evaluation: "+ str(faithfulness_result.score))
 relevancy_result = relevancy_evaluator.evaluate_response(query=q,response=response2)
 print("Relevancy Result: " + str(relevancy_result.score))
+
+print("\n===== QUESTION 4 PART 2 =====")
+q2 = "What opportunities for upward development that Brightleaf possesses?"
+response3 = query_engine.query(q2)
+print("A:", response3)
+faithfulness_result2 = faithfulness_evaluator.evaluate_response(query=q2,response=response3)
+print("Faithfulness Evaluation: "+ str(faithfulness_result2.score))
+relevancy_result2 = relevancy_evaluator.evaluate_response(query=q2,response=response3)
+print("Relevancy Result: " + str(relevancy_result2.score))
+#A faithfulness score of 1.0 means the model's response was supported by the information it retrieved and didn't hallucinate or make things up. A score of 0.0 means the response wasn't supported by the retrieved information and may have included hallucinations.Relevancy measures whether the model's response is on topic or if it's rambling and giving information that doesn't relate to the question. The difference is that relevancy checks if the answer stays on topic, while faithfulness checks if the model is making things up or giving information supported by the documents.
+# No, both queries received a faithfulness and relevancy score of 1.0. I think this happened because the model was able to find relevant information for both questions. The questions were specific enough, and the model didn't have to go off topic or make anything up.LLM-as-a-judge is using another AI model to evaluate how well the original model answered a question. It's used for RAG evaluation because it can look at whether the response is relevant and supported by the retrieved information instead of just checking if the answer is right or wrong. It can also be faster and more efficient than having multiple people evaluate the responses.#
