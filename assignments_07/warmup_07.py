@@ -668,4 +668,137 @@ def compute_correlation(col1: str, col2: str) -> dict:
     """
     return csv_backend.compute_correlation(col1,col2)
 print(compute_correlation.description)
-##
+#Q8#
+from smolagents import ToolCallingAgent, OpenAIServerModel, tool
+from smolagents import CodeAgent
+import matplotlib.pyplot as plt
+
+@tool
+def list_csv_files() -> dict:
+    """List available CSV files in resources/.
+
+    Returns:
+        A dict with a "files" list, or a message if none are found.
+    """
+    return csv_backend.list_csv_files()
+
+
+@tool
+def load_csv(filename: str) -> dict:
+    """Load a CSV file from resources/ and make it the active dataset.
+
+    Args:
+        filename: CSV filename in resources/. You can pass "bike_commute" or "bike_commute.csv".
+
+    Returns:
+        A dict with a status message and column names, or an error dict.
+    """
+    return csv_backend.load_csv(filename)
+
+
+@tool
+def get_columns() -> list[str] | dict:
+    """Return column names for the currently loaded CSV.
+
+    Returns:
+        A list of column names, or an error dict if no CSV is loaded.
+    """
+    return csv_backend.get_columns()
+
+
+@tool
+def summarize_columns(columns: list[str] | None = None) -> dict:
+    """Return summary stats for selected columns (or all columns). 
+    This includes count, mean, std, min, max, and percentiles for numeric columns,
+    or count, unique, top, freq for categorical columns.
+
+    Args:
+        columns: Column names to summarize. If None, summarizes all columns.
+
+    Returns:
+        A dict of summary statistics (from pandas.describe), or an error dict.
+    """
+    return csv_backend.summarize_columns(columns)
+
+
+@tool
+def describe_column(column: str) -> dict:
+    """Describe a single column (basic stats) for the requested column.
+    This includes count, mean, std, min, max, and percentiles for numeric column,
+    or count, unique, top, freq for categorical column.
+
+    Args:
+        column: The name of the column to describe.
+
+    Returns:
+        A dict of basic stats for the column, or an error dict.
+    """
+    return csv_backend.describe_column(column)
+
+
+@tool
+def plot_data(y: str, x: str | None = None, plot_type: str = "line") -> str | dict:
+    """Plot from the active CSV.
+
+    Args:
+        y: Column name to plot on the y-axis. 
+        x: Column name to plot on the x-axis. If None, use row index.
+        plot_type: "line" or "scatter". Scatter requires x and y.
+
+    Returns:
+        Generates and shows the plot. 
+        Retirms a short success message string, or an error dict/string.
+    """
+    return csv_backend.plot_data(y=y, x=x, plot_type=plot_type)
+TOOLS = [
+    list_csv_files,
+    load_csv,
+    get_columns,
+    summarize_columns,
+    describe_column,
+    plot_data,
+    compute_correlation
+]
+CODE_INSTRUCTIONS = """
+You are a helpful CSV analysis assistant.
+
+You can do two kinds of actions:
+1) Call the provided tools.
+2) Write and execute Python code when tools are not enough.
+
+Rules:
+- Prefer tools for simple tasks.
+- IMPORTANT: If the user requests plot styling (color, marker, title text, labels, grid, etc.)
+  that the plot_data tool cannot control, DO NOT call plot_data.
+  Instead, write matplotlib code directly so the plot matches the request.
+  If code execution fails, do not fall back to plot_data when the user requested styling (like color). 
+  Explain what failed and what you would need to proceed.
+- Be honest: only claim you did something if the code or tool actually did it.
+- Assume the active dataset lives in csv_manager.df after a CSV is loaded.
+"""
+api_key = os.getenv("OPENAI_API_KEY")
+model_to_use = "gpt-4o-mini"  # default model ID
+model = OpenAIServerModel(
+    api_key=api_key,
+    model_id=model_to_use,
+)
+code_agent = CodeAgent(
+    tools=TOOLS,
+    model=model,
+    instructions = CODE_INSTRUCTIONS,
+    additional_authorized_imports=["pandas","matplotlib.pyplot","numpy"],
+    max_steps = 8,
+)
+model = OpenAIServerModel(api_key= api_key,model_id=model_to_use, )
+prompt = "Load bike_commute.csv. Plot avg_heart_rate vs duration_min as a scatter plot with green dots."
+tool_agent = ToolCallingAgent(tools=TOOLS, model=model,instructions =SYSTEM_PROMPT)
+response_tool = tool_agent.run(prompt)
+response_code = code_agent.run(prompt, additional_args={"csv_manager": csv_backend})
+print(response_tool)
+print(response_code)
+# Both agents produced a scatter plot comparing average heart rate and duration. The ToolCallingAgent created the scatter plot but didn't change the dots to green.
+# The CodeAgent created the scatter plot with green dots.This shows that CodeAgent is more useful when you want to do more with the plot, like changing the colors and adding other details.
+
+#Q9#
+#1. ToolCallingAgent would be a better choice to use when you need something simple done quickly using tools that are already there. It can take fewer stpes and potentially cost less.
+# 2. One risk of using CodeAgent is that it wrties and runs its own code so it could potentially make a mistake or run something it wasn't suppose to run.#
