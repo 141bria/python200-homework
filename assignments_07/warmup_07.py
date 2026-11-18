@@ -645,3 +645,27 @@ messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 result = run_agent_cycle(messages, "Load bike_commute.csv and compute the correlation between avg_traffic_density and avg_speed_kmh.")
 print(result)
 #Q6#
+import json
+print(json.dumps(messages, indent=2, default=str))
+# System: Tells the AI how it's supposed to behave.
+# User: The person asking the AI to load the CSV and answer a question.
+# Assistant: The AI doing the work and figuring out what tools to use.
+# Tool: What's used to complete the specific task.
+
+                                            #Lesson 04: smolagents#
+#Q7#
+from smolagents import tool
+@tool
+def compute_correlation(col1: str, col2: str) -> dict:
+    """
+        Compute the Pearson correlation between two CSV columns
+    Args:
+    col1: First column to compare.
+    col2: Second column to comapre.
+
+    Returns:
+    A dictionary with the correlation results.
+    """
+    return csv_backend.compute_correlation(col1,col2)
+print(compute_correlation.description)
+##
