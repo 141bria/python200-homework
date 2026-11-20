@@ -163,3 +163,6 @@ print(response_2)
 # 2. I was surprised when the agent used an existing tool to find the data for my own question, then wrote its own code to compare the results. I wasn't expecting it to do both.
 
 # 3. I think a tool that looks up data for a specific country and year would be useful. It could help answer questions about a country's healthy life expectancy without ranking other countries.
+
+#AI disclosure#
+#I used ChatGPT as a learning resource throughout this assignment to help with debugging, understanding Python syntax, and working through errors in my code. During the project, I used it to help fix issues with my functions, understand error messages, and troubleshoot my API key setup when the agent wasn't connecting properly.I also used ChatGPT to better understand how the CodeAgent works, especially the difference between using an existing tool and generating its own code. It helped me review my results and work through my questions.#
