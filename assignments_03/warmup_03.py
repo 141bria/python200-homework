@@ -33,7 +33,7 @@ print(mean_x_train)
 
 #Q2#
 encoder = OneHotEncoder(sparse_output=False)
-seasons = [["winter"],["spring"],["summer"],["fall"]]
+seasons = df[["season"]]
 encoded = encoder.fit_transform(seasons)
 print(encoder.get_feature_names_out())
 print(encoded.shape)
@@ -100,7 +100,10 @@ for k in [1, 3, 5, 7, 9, 11, 15, 21]:
 knn_unscaled = KNeighborsClassifier(n_neighbors=5)
 knn_unscaled.fit(X_train,y_train)
 print("Unscaled accuracy:", accuracy_score(y_test,knn_unscaled.predict(X_test)))
-knn_scaled1 = KNeighborsClassifier(n_neighbors=5)
+knn_scaled1 = Pipeline([
+    ("scaler",StandardScaler(),
+     ("knn",KNeighborsClassifier(n_neighbors=5)))
+])
 knn_scaled1.fit(X_train,y_train)
 print("Scaled accuracy:", accuracy_score(y_test,knn_scaled1.predict(X_test)))
 #No, scaling didn't help in this case. However scaling would be vital to use for a distance based model so if something is greater in distance than another feature it isn't weighed more than what it should be.#
