@@ -115,7 +115,7 @@ model = Pipeline([
 ])
 model.fit(X_train,y_train)
 y_pred1=model.predict(X_test)
-print(classification_report(y_test,y_pred,target_names=["skip","good"]))
+print(classification_report(y_test,y_pred1,target_names=["skip","good"]))
 #Q2#
 print("temperature_2m_max:", model.named_steps["logreg"].coef_[0][0])
 print("temperature_2m_min:", model.named_steps["logreg"].coef_[0][1])
