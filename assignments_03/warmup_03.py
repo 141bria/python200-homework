@@ -101,8 +101,8 @@ knn_unscaled = KNeighborsClassifier(n_neighbors=5)
 knn_unscaled.fit(X_train,y_train)
 print("Unscaled accuracy:", accuracy_score(y_test,knn_unscaled.predict(X_test)))
 knn_scaled1 = Pipeline([
-    ("scaler",StandardScaler(),
-     ("knn",KNeighborsClassifier(n_neighbors=5)))
+    ("scaler",StandardScaler()),
+    ("knn",KNeighborsClassifier(n_neighbors=5))
 ])
 knn_scaled1.fit(X_train,y_train)
 print("Scaled accuracy:", accuracy_score(y_test,knn_scaled1.predict(X_test)))
