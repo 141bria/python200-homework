@@ -193,10 +193,12 @@ ai_analyze_review = client.chat.completions.create(
     }
     ]
 )
+print(ai_analyze_review.choices[0].message.content)
 try:
     json_load= json.loads(ai_analyze_review.choices[0].message.content)
 except json.JSONDecodeError:
     print("Error: response was not valid JSON")
+    print(ai_analyze_review.choices[0].message.content)
 print("Sentiment:", json_load["sentiment"],"Confidence:", json_load["confidence"],"Reason:",json_load["reason"])
 #Q6#
 user_text = "First boil a pot of water. Once boiling, add a handful of salt and the \
