@@ -16,7 +16,7 @@ def get_completion(messages, model="gpt-4o-mini", temperature=0.7):
     return response.choices[0].message.content
 
 prompt = f"""
-You will be given text inside triple backticks.
+You are a professional job application coach helping career changers improve thier resumes and cover letters. You will be given text inside triple backticks.
 Stay focused on the job application materials, always remind the user to review and edit its output before submitting anywhere, and acknowledge that you may not know the user's specific industry norms, and that the user should use their own judgement. 
 """
 messages=[{"role":"system","content":prompt},
