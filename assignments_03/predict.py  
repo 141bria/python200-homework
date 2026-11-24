@@ -1,0 +1,30 @@
+import joblib
+import json
+import pandas as pd
+import numpy as np 
+#Task 7#
+clf = joblib.load("models/weather_classifier.pkl")
+with open("models/weather_classifier_metadata.json") as f:
+    metadata = json.load(f)
+print(type(clf))
+print(metadata["city"])
+print(metadata["features"])
+print(metadata["test_accuracy"])
+new_days = pd.DataFrame([
+  {"temperature_2m_max":15,"temperature_2m_min":5,"precipitation_sum":1,"wind_speed_10m_max":10},
+  {"temperature_2m_max":4,"temperature_2m_min":-1,"precipitation_sum":9,"wind_speed_10m_max":40},  
+  {"temperature_2m_max":6,"temperature_2m_min":0,"precipitation_sum":3,"wind_speed_10m_max":29},
+  {"temperature_2m_max":20,"temperature_2m_min":0,"precipitation_sum":3,"wind_speed_10m_max":45}  
+])
+new_days = new_days[metadata["features"]]
+preds = clf.predict(new_days)
+probs = clf.predict_proba(new_days)[:,1]
+for d,(preds,probs) in enumerate(zip(preds,probs)):
+    label = "good" if preds == 1 else "skip"
+    print(new_days.iloc[d])
+    print(f"Day {d + 1}: {label} (confidence: {probs:.2f})")
+#I used AI to help me understand the syntax for predicting and printing the results on lines 19-25.#
+#Task 8#
+# 1. My borderline day was Day 3, and the model gave it a probability of 0.40. I would say the model was somewhat uncertain because it wasn't too far from 0.50. If it predicted 0.52, I wouldn't fully trust it because it's barely above 0.50. I would probably check the weather again before telling someone it's a good day to run.
+# 2. If someone ran predict.py before train_classifier.py, the saved model wouldn't exist yet, so it wouldn't be able to load it or make predictions. I would make the error message more helpful by saying something like, "Oh no! The model hasn't been trained or saved yet. Run train_classifier.py first."
+# 3. In Week 10, I would need to change predict.py so it could automatically fetch weather data from an API instead of me manually creating four pretend weather days. I could also use Pydantic to validate the data and make sure the weather information is correct before the model uses it.#
